@@ -1,4 +1,5 @@
 export interface IDTDataType {
+    key: string,
     text: string,
     value: string,
 }

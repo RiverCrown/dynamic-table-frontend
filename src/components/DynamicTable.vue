@@ -39,6 +39,7 @@
         </el-button>
         <template #dropdown>
           <filter-builder
+            :level="0"
             :filter-group="this.testFilterGroup"
             :columns="this.config.headers"
             @filter-group-change="(filterGroup) => this.testFilterGroup = filterGroup"
@@ -205,6 +206,7 @@ import {
 import draggable from 'vuedraggable';
 import FilterBuilder from '@/components/FilterBuilder.vue';
 import { IDTConfig } from '@/common/interface/DynamicTableInterface';
+import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
 
 export default defineComponent({
   name: 'DynamicTable',
@@ -238,8 +240,18 @@ export default defineComponent({
         filterSet: [
           {
             key: 'item_1',
-            columnName: 'haha',
-            operator: '>',
+            column: {
+              columnName: 'test',
+              alias: '测试',
+              dataType: DATA_TYPE.DECIMAL,
+            },
+            operator: {
+              operator: {
+                text: '<',
+                value: 'LESS_THAN',
+              },
+              inputType: 'SELECT',
+            },
             value: 123,
           },
           {
@@ -248,8 +260,18 @@ export default defineComponent({
             filterSet: [
               {
                 key: 'item_2',
-                columnName: 'haha',
-                operator: '>',
+                column: {
+                  columnName: 'name',
+                  alias: '名字',
+                  dataType: DATA_TYPE.SINGLE_LINE_TEXT,
+                },
+                operator: {
+                  operator: {
+                    text: '<',
+                    value: 'LESS_THAN',
+                  },
+                  inputType: 'SELECT',
+                },
                 value: 123,
               },
               {
@@ -258,8 +280,18 @@ export default defineComponent({
                 filterSet: [
                   {
                     key: 'item_3',
-                    columnName: 'haha',
-                    operator: '>',
+                    column: {
+                      columnName: 'test',
+                      alias: '测试',
+                      dataType: DATA_TYPE.DATETIME,
+                    },
+                    operator: {
+                      operator: {
+                        text: '<',
+                        value: 'LESS_THAN',
+                      },
+                      inputType: 'SELECT',
+                    },
                     value: 123,
                   },
                 ],

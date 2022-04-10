@@ -9,7 +9,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import DynamicTable from '@/components/DynamicTable.vue';
-import { DataType } from '@/common/constant/DynamicTableConstant';
+import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
 
 export default defineComponent({
   name: 'HomeView',
@@ -29,21 +29,21 @@ export default defineComponent({
           alias: '时间',
           visible: true,
           sort: 'ASC',
-          dataType: DataType.DATETIME,
+          dataType: DATA_TYPE.DATETIME,
         },
         {
           columnName: 'name',
           alias: '姓名',
           visible: true,
           sort: 'ASC',
-          dataType: DataType.SINGLE_LINE_TEXT,
+          dataType: DATA_TYPE.SINGLE_LINE_TEXT,
         },
         {
           columnName: 'test',
           alias: '测试',
           visible: true,
           sort: 'ASC',
-          dataType: DataType.DECIMAL,
+          dataType: DATA_TYPE.DECIMAL,
         },
       ],
       tableData: [

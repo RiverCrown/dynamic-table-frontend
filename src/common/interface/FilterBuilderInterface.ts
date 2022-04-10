@@ -1,8 +1,9 @@
 import { ConjunctionEnum } from '@/common/enum/FilterBuilderEnum';
+import { IDTHeader } from '@/common/interface/DynamicTableInterface';
 
 export interface IFilterItem {
     key: string;
-    columnName: string;
+    column: IDTHeader;
     operator: string;
     value: string | number;
 }
