@@ -4,7 +4,7 @@ import { IDTHeader } from '@/common/interface/DynamicTableInterface';
 export interface IFilterItem {
     key: string;
     column: IDTHeader;
-    operator: string;
+    operator: any;
     value: string | number;
 }
 

@@ -60,7 +60,6 @@
               placeholder="选择字段"
               v-model="element.column"
               value-key="columnName"
-              :teleported="false"
             >
               <el-option
                 v-for="col in this.columns"
@@ -75,7 +74,6 @@
               placeholder="选择操作"
               v-model="element.operator"
               value-key="operator.value"
-              :teleported="false"
             >
               <div v-if="element.column">
                 <el-option
@@ -88,7 +86,6 @@
             </el-select>
             <el-select
               v-if="!element.conjunction && element.operator.inputType === inputType.MULTI_SELECT"
-              :teleported="false"
               multiple
               collapse-tags
               collapse-tags-tooltip
@@ -102,7 +99,6 @@
             />
             <el-select
               v-if="!element.conjunction && element.operator.inputType === inputType.SELECT"
-              :teleported="false"
               size="small"
               v-model="element.value"
               filterable
@@ -115,7 +111,6 @@
               v-if="!element.conjunction && element.operator.inputType === inputType.DATETIME"
               v-model="element.value"
               size="small"
-              :teleported="false"
               value-format="YYYY-MM-DD HH:mm:ss"
               range-separator=","
               type="datetime"
@@ -125,7 +120,6 @@
               v-if="!element.conjunction && element.operator.inputType === inputType.DATETIME_RANGE"
               v-model="element.value"
               size="small"
-              :teleported="false"
               value-format="YYYY-MM-DD HH:mm:ss"
               range-separator=","
               type="datetimerange"
@@ -133,7 +127,6 @@
             />
             <el-select
               v-if="!element.conjunction && element.operator.inputType === inputType.NUMBER_RANGE"
-              :teleported="false"
               size="small"
               v-model="element.value"
               filterable
@@ -152,7 +145,6 @@
                 <DeleteFilled />
               </el-icon>
             </el-button>
-
           </el-space>
         </div>
       </template>
@@ -212,6 +204,10 @@ export default defineComponent({
       const filterSetSize = this.innerFilterGroup.filterSet.length;
       this.innerFilterGroup.filterSet.push({
         key: `item_${filterSetSize + 1}`,
+        operator: {
+          operator: '',
+          inputType: '',
+        },
       });
       this.$emit('filterGroupChange', this.innerFilterGroup);
     },

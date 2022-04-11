@@ -27,17 +27,23 @@
           </el-dropdown-menu>
         </template>
       </el-dropdown>
-      <el-dropdown
-        trigger="click"
-        :hide-on-click="false"
+      <el-popover
+        width="640px"
+        :visible="this.filterPopVisible"
+        transition="el-zoom-in-top"
       >
-        <el-button type="text">
-          <el-icon>
-            <Filter />
-          </el-icon>
-          过滤
-        </el-button>
-        <template #dropdown>
+        <template #reference>
+          <el-button
+            type="text"
+            @click="()=> { this.filterPopVisible = !this.filterPopVisible }"
+          >
+            <el-icon>
+              <Filter />
+            </el-icon>
+            过滤
+          </el-button>
+        </template>
+        <template #default>
           <filter-builder
             :level="0"
             :filter-group="this.testFilterGroup"
@@ -45,7 +51,7 @@
             @filter-group-change="(filterGroup) => this.testFilterGroup = filterGroup"
           />
         </template>
-      </el-dropdown>
+      </el-popover>
       <el-dropdown
         trigger="click"
         :hide-on-click="false"
@@ -234,6 +240,9 @@ export default defineComponent({
     return {
       cellColIdx: -1,
       cellRowIdx: -1,
+      // 过滤的下拉框中如果还有选择组件（SELECT），那么在操作选择组件时会因为点击了外部元素而导致下拉框隐藏
+      // 因此需要自己来控制过滤下拉框的显隐
+      filterPopVisible: false,
       testFilterGroup: {
         key: 'group_1',
         conjunction: 'AND',

@@ -3,7 +3,6 @@ export const INPUT_TYPE = {
   MULTI_SELECT: 'MULTI_SELECT',
   DATETIME: 'DATETIME',
   DATETIME_RANGE: 'DATETIME_RANGE',
-  NUMBER_RANGE: 'NUMBER_RANGE',
 };
 
 export const OPERATOR_TYPE = {
@@ -303,10 +302,6 @@ export const DATA_TYPE_OPERATORS_MAP = new Map([
           operator: OPERATOR_TYPE.GREATER_THAN_OR_EQUAL_TO,
           inputType: INPUT_TYPE.SELECT,
         },
-        {
-          operator: OPERATOR_TYPE.BETWEEN,
-          inputType: INPUT_TYPE.NUMBER_RANGE,
-        },
       ],
     },
   ],
@@ -356,10 +351,6 @@ export const DATA_TYPE_OPERATORS_MAP = new Map([
           operator: OPERATOR_TYPE.GREATER_THAN_OR_EQUAL_TO,
           inputType: INPUT_TYPE.SELECT,
         },
-        {
-          operator: OPERATOR_TYPE.BETWEEN,
-          inputType: INPUT_TYPE.NUMBER_RANGE,
-        },
       ],
     },
   ],
@@ -390,10 +381,6 @@ export const DATA_TYPE_OPERATORS_MAP = new Map([
         {
           operator: OPERATOR_TYPE.GREATER_THAN_OR_EQUAL_TO,
           inputType: INPUT_TYPE.SELECT,
-        },
-        {
-          operator: OPERATOR_TYPE.BETWEEN,
-          inputType: INPUT_TYPE.NUMBER_RANGE,
         },
       ],
     },
