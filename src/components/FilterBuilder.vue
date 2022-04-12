@@ -158,10 +158,10 @@ import { defineComponent, PropType } from 'vue';
 import draggable from 'vuedraggable';
 import { MoreFilled, DeleteFilled } from '@element-plus/icons-vue';
 import {
+  IDTHeader,
   IFilterGroup,
   IFilterItem,
-} from '@/common/interface/FilterBuilderInterface';
-import { IDTHeader } from '@/common/interface/DynamicTableInterface';
+} from '@/common/interface/DynamicTableInterface';
 import {
   DATA_TYPE_OPERATORS_MAP,
   INPUT_TYPE,

@@ -1,7 +1,7 @@
 <template>
   <dynamic-table
     :data="tableData"
-    :config="{ headers }"
+    :config="config"
     @config-change="aa"
   />
 </template>
@@ -19,33 +19,36 @@ export default defineComponent({
   methods: {
     aa(config: any) {
       console.log(config);
+      this.config = config;
     },
   },
   data() {
     return {
-      headers: [
-        {
-          columnName: 'time',
-          alias: '时间',
-          visible: true,
-          sort: 'ASC',
-          dataType: DATA_TYPE.DATETIME,
-        },
-        {
-          columnName: 'name',
-          alias: '姓名',
-          visible: true,
-          sort: 'ASC',
-          dataType: DATA_TYPE.SINGLE_LINE_TEXT,
-        },
-        {
-          columnName: 'test',
-          alias: '测试',
-          visible: true,
-          sort: 'ASC',
-          dataType: DATA_TYPE.DECIMAL,
-        },
-      ],
+      config: {
+        headers: [
+          {
+            columnName: 'time',
+            alias: '时间',
+            visible: true,
+            dataType: DATA_TYPE.DATETIME,
+          },
+          {
+            columnName: 'name',
+            alias: '姓名',
+            visible: true,
+            dataType: DATA_TYPE.SINGLE_LINE_TEXT,
+          },
+          {
+            columnName: 'test',
+            alias: '测试',
+            visible: true,
+            dataType: DATA_TYPE.DECIMAL,
+          },
+        ],
+        sort: [],
+        group: [],
+      },
+
       tableData: [
         {
           date: '2016-05-03',

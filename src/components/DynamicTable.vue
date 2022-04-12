@@ -14,7 +14,7 @@
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item
-              v-for="header in config.headers"
+              v-for="header in innerConfig.headers"
               :key="header.columnName"
             >
               <el-checkbox
@@ -47,69 +47,147 @@
           <filter-builder
             :level="0"
             :filter-group="this.testFilterGroup"
-            :columns="this.config.headers"
+            :columns="this.innerConfig.headers"
             @filter-group-change="(filterGroup) => this.testFilterGroup = filterGroup"
           />
         </template>
       </el-popover>
-      <el-dropdown
-        trigger="click"
-        :hide-on-click="false"
+      <el-popover
+        width="200px"
+        :visible="this.groupPopVisible"
+        transition="el-zoom-in-top"
       >
-        <el-button type="text">
-          <el-icon>
-            <Grid />
-          </el-icon>
-          分组
-        </el-button>
-      </el-dropdown>
-      <el-dropdown
-        trigger="click"
-        :hide-on-click="false"
-      >
-        <el-button type="text">
-          <el-icon>
-            <Sort />
-          </el-icon>
-          排序
-        </el-button>
-        <template #dropdown>
+        <template #reference>
+          <el-button
+            type="text"
+            @click="()=> { this.groupPopVisible = !this.groupPopVisible }"
+          >
+            <el-icon>
+              <Grid />
+            </el-icon>
+            分组
+          </el-button>
+        </template>
+        <template #default>
+          <el-select
+            size="small"
+            placeholder="选择字段"
+            value-key="columnName"
+            @change="this.addGroup"
+            :style="{ width: '200px' }"
+          >
+            <el-option
+              v-for="col in this.innerConfig.headers"
+              :key="col.columnName"
+              :label="col.alias"
+              :value="col"
+            />
+          </el-select>
+          <el-empty
+            v-if="this.innerConfig.group.length === 0"
+            :image-size="64"
+            description="无分组字段"
+          />
           <draggable
-            :list="config.headers"
+            :list="this.innerConfig.group"
             handle=".dt_drag_handle"
             ghost-class="dt_ghost"
             item-key="columnName"
-            @change="headerSortConfigChange"
+            @change="() => { this.$emit('configChange', this.innerConfig) }"
           >
             <template #item="{ element }">
-              <el-row :style="{ width: '200px', margin: '8px' }">
-                <el-col :span="2">
-                  <el-icon class="dt_drag_handle">
-                    <MoreFilled />
-                  </el-icon>
-                </el-col>
-                <el-col
-                  :span="6"
-                  :style="{ textAlign: 'center' }"
+              <div :style="{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '8px'
+                }">
+                <el-icon class="dt_drag_handle">
+                  <MoreFilled />
+                </el-icon>
+                <span>{{ element.alias }}</span>
+                <el-radio-group
+                  @change="() => { this.$emit('configChange', this.innerConfig) }"
+                  v-model="element.type"
+                  size="small"
                 >
-                  <span>{{ element.alias }}</span>
-                </el-col>
-                <el-col :span="16">
-                  <el-radio-group
-                    v-model="element.sort"
-                    @change="headerSortConfigChange"
-                    size="small"
-                  >
-                    <el-radio-button label="NONE">无</el-radio-button>
-                    <el-radio-button label="ASC">升序</el-radio-button>
-                    <el-radio-button label="DESC">降序</el-radio-button>
-                  </el-radio-group>
-                </el-col>
-              </el-row>
+                  <el-radio-button label="ASC">升序</el-radio-button>
+                  <el-radio-button label="DESC">降序</el-radio-button>
+                </el-radio-group>
+              </div>
             </template>
           </draggable>
         </template>
-      </el-dropdown>
+      </el-popover>
+      <el-popover
+        width="200px"
+        :visible="this.sortPopVisible"
+        transition="el-zoom-in-top"
+      >
+        <template #reference>
+          <el-button
+            type="text"
+            @click="()=> { this.sortPopVisible = !this.sortPopVisible }"
+          >
+            <el-icon>
+              <Sort />
+            </el-icon>
+            排序
+          </el-button>
+        </template>
+        <template #default>
+          <el-select
+            size="small"
+            placeholder="选择字段"
+            value-key="columnName"
+            :style="{ width: '200px' }"
+            @change="this.addSort"
+          >
+            <el-option
+              v-for="col in this.innerConfig.headers"
+              :key="col.columnName"
+              :label="col.alias"
+              :value="col"
+            />
+          </el-select>
+          <el-empty
+            v-if="this.innerConfig.sort.length === 0"
+            :image-size="64"
+            description="无排序字段"
+          />
+          <br />
+          <draggable
+            :list="innerConfig.sort"
+            handle=".dt_drag_handle"
+            ghost-class="dt_ghost"
+            item-key="columnName"
+            @change="() => { this.$emit('configChange', this.innerConfig) }"
+          >
+            <template #item="{ element }">
+              <div :style="{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '8px'
+                }"
+              >
+                <el-icon class="dt_drag_handle">
+                  <MoreFilled />
+                </el-icon>
+                <span>{{ element.alias }}</span>
+                <el-radio-group
+                  @change="() => { this.$emit('configChange', this.innerConfig) }"
+                  v-model="element.type"
+                  size="small"
+                >
+                  <el-radio-button label="ASC">升序</el-radio-button>
+                  <el-radio-button label="DESC">降序</el-radio-button>
+                </el-radio-group>
+              </div>
+            </template>
+          </draggable>
+        </template>
+      </el-popover>
       <el-button type="text">
         <el-icon>
           <Plus />
@@ -154,7 +232,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          v-for="header in config.headers.filter(header => header.visible)"
+          v-for="header in innerConfig.headers.filter(header => header.visible)"
           :key="header.columnName"
           :prop="header.columnName"
           :label="header.alias"
@@ -211,7 +289,7 @@ import {
 } from '@element-plus/icons-vue';
 import draggable from 'vuedraggable';
 import FilterBuilder from '@/components/FilterBuilder.vue';
-import { IDTConfig } from '@/common/interface/DynamicTableInterface';
+import { IDTConfig, IDTHeader } from '@/common/interface/DynamicTableInterface';
 import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
 
 export default defineComponent({
@@ -243,6 +321,9 @@ export default defineComponent({
       // 过滤的下拉框中如果还有选择组件（SELECT），那么在操作选择组件时会因为点击了外部元素而导致下拉框隐藏
       // 因此需要自己来控制过滤下拉框的显隐
       filterPopVisible: false,
+      sortPopVisible: false,
+      groupPopVisible: false,
+      innerConfig: JSON.parse(JSON.stringify(this.config)),
       testFilterGroup: {
         key: 'group_1',
         conjunction: 'AND',
@@ -330,10 +411,23 @@ export default defineComponent({
       return '';
     },
     headerVisibleConfigChange() {
-      this.$emit('configChange', this.config);
+      this.$emit('configChange', this.innerConfig);
     },
-    headerSortConfigChange() {
-      this.$emit('configChange', this.config);
+    addSort(header: IDTHeader) {
+      this.innerConfig.sort.push({
+        columnName: header.columnName,
+        alias: header.alias,
+        type: 'ASC',
+      });
+      this.$emit('configChange', this.innerConfig);
+    },
+    addGroup(header: IDTHeader) {
+      this.innerConfig.group.push({
+        columnName: header.columnName,
+        alias: header.alias,
+        type: 'ASC',
+      });
+      this.$emit('configChange', this.innerConfig);
     },
   },
 });
