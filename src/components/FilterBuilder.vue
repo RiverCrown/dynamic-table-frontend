@@ -12,7 +12,7 @@
       <el-radio-group
         size="small"
         v-model="innerFilterGroup.conjunction"
-        @change="() => this.$emit('filterGroupChange', this.innerFilterGroup)"
+        @change="() => $emit('filterGroupChange', innerFilterGroup)"
       >
         <el-radio-button label="AND">与</el-radio-button>
         <el-radio-button label="OR">或</el-radio-button>
@@ -21,7 +21,7 @@
         <el-button @click="addFilter">添加过滤</el-button>
         <el-button @click="addFilterGroup">添加过滤组</el-button>
         <el-button
-          v-if="this.level !== 0"
+          v-if="level !== 0"
           type="danger"
           @click="deleteFilterGroup"
         >
@@ -45,14 +45,14 @@
             </el-icon>
             <filter-builder
               v-if="element.conjunction"
-              :level="this.level + 1"
+              :level="level + 1"
               :filter-group="element"
-              :columns="this.columns"
+              :columns="columns"
               @filter-group-change="(filterGroup) => {
-                element = filterGroup;
-                this.$emit('filterGroupChange', this.innerFilterGroup)
+                innerFilterGroup.filterSet[index] = filterGroup
+                $emit('filterGroupChange', innerFilterGroup)
               }"
-              @filter-group-delete="() => this.deleteFilterItem(index)"
+              @filter-group-delete="() => deleteFilterItem(index)"
             />
             <el-select
               v-if="!element.conjunction"
@@ -62,7 +62,7 @@
               value-key="columnName"
             >
               <el-option
-                v-for="col in this.columns"
+                v-for="col in columns"
                 :key="col.columnName"
                 :label="col.alias"
                 :value="col"
@@ -85,7 +85,7 @@
               </div>
             </el-select>
             <el-select
-              v-if="!element.conjunction && element.operator.inputType === inputType.MULTI_SELECT"
+              v-if="!element.conjunction && element.operator.inputType === INPUT_TYPE.MULTI_SELECT"
               multiple
               collapse-tags
               collapse-tags-tooltip
@@ -98,7 +98,7 @@
               placeholder="输入值"
             />
             <el-select
-              v-if="!element.conjunction && element.operator.inputType === inputType.SELECT"
+              v-if="!element.conjunction && element.operator.inputType === INPUT_TYPE.SELECT"
               size="small"
               v-model="element.value"
               filterable
@@ -108,7 +108,7 @@
               placeholder="输入值"
             />
             <el-date-picker
-              v-if="!element.conjunction && element.operator.inputType === inputType.DATETIME"
+              v-if="!element.conjunction && element.operator.inputType === INPUT_TYPE.DATETIME"
               v-model="element.value"
               size="small"
               value-format="YYYY-MM-DD HH:mm:ss"
@@ -117,23 +117,14 @@
               placeholder="选择日期"
             />
             <el-date-picker
-              v-if="!element.conjunction && element.operator.inputType === inputType.DATETIME_RANGE"
+              v-if="!element.conjunction &&
+                element.operator.inputType === INPUT_TYPE.DATETIME_RANGE"
               v-model="element.value"
               size="small"
               value-format="YYYY-MM-DD HH:mm:ss"
               range-separator=","
               type="datetimerange"
               placeholder="选择日期范围"
-            />
-            <el-select
-              v-if="!element.conjunction && element.operator.inputType === inputType.NUMBER_RANGE"
-              size="small"
-              v-model="element.value"
-              filterable
-              allow-create
-              default-first-option
-              :reserve-keyword="false"
-              placeholder="输入值"
             />
             <el-button
               v-if="!element.conjunction"
@@ -195,15 +186,29 @@ export default defineComponent({
   },
   data() {
     return {
-      innerFilterGroup: JSON.parse(JSON.stringify(this.filterGroup)),
-      inputType: INPUT_TYPE,
+      innerFilterGroup: JSON.parse(JSON.stringify(this.filterGroup)) as IFilterGroup,
+      INPUT_TYPE,
     };
+  },
+  computed: {
+
   },
   methods: {
     addFilter() {
       const filterSetSize = this.innerFilterGroup.filterSet.length;
       this.innerFilterGroup.filterSet.push({
         key: `item_${filterSetSize + 1}`,
+        column: {
+          columnName: '',
+          alias: '',
+          visible: true,
+          dataType: {
+            key: '',
+            text: '',
+            value: '',
+          },
+        },
+        value: '',
         operator: {
           operator: '',
           inputType: '',

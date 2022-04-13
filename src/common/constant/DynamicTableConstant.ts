@@ -175,12 +175,30 @@ export const DATA_TYPE_OPERATORS_MAP = new Map([
     DATA_TYPE.LONG_TEXT.key,
     {
       operatorAndInputType: [
-        OPERATOR_TYPE.CONTAIN,
-        OPERATOR_TYPE.NOT_CONTAIN,
-        OPERATOR_TYPE.IS,
-        OPERATOR_TYPE.IS_NOT,
-        OPERATOR_TYPE.IN,
-        OPERATOR_TYPE.NOT_IN,
+        {
+          operator: OPERATOR_TYPE.CONTAIN,
+          inputType: INPUT_TYPE.SELECT,
+        },
+        {
+          operator: OPERATOR_TYPE.NOT_CONTAIN,
+          inputType: INPUT_TYPE.SELECT,
+        },
+        {
+          operator: OPERATOR_TYPE.IS,
+          inputType: INPUT_TYPE.SELECT,
+        },
+        {
+          operator: OPERATOR_TYPE.IS_NOT,
+          inputType: INPUT_TYPE.SELECT,
+        },
+        {
+          operator: OPERATOR_TYPE.IN,
+          inputType: INPUT_TYPE.MULTI_SELECT,
+        },
+        {
+          operator: OPERATOR_TYPE.NOT_IN,
+          inputType: INPUT_TYPE.MULTI_SELECT,
+        },
       ],
     },
   ],

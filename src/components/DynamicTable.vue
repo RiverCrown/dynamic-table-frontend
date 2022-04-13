@@ -1,22 +1,15 @@
 <template>
   <el-row>
     <el-space wrap>
-      <el-dropdown
-        trigger="click"
-        :hide-on-click="false"
-      >
+      <el-dropdown trigger="click" :hide-on-click="false">
         <el-button type="text">
           <el-icon>
             <Hide />
-          </el-icon>
-          隐藏字段
+          </el-icon>隐藏字段
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item
-              v-for="header in innerConfig.headers"
-              :key="header.columnName"
-            >
+            <el-dropdown-item v-for="header in innerConfig.headers" :key="header.columnName">
               <el-checkbox
                 v-model="header.visible"
                 :label="header.alias"
@@ -27,45 +20,29 @@
           </el-dropdown-menu>
         </template>
       </el-dropdown>
-      <el-popover
-        width="640px"
-        :visible="this.filterPopVisible"
-        transition="el-zoom-in-top"
-      >
+      <el-popover width="640px" :visible="filterPopVisible" transition="el-zoom-in-top">
         <template #reference>
-          <el-button
-            type="text"
-            @click="()=> { this.filterPopVisible = !this.filterPopVisible }"
-          >
+          <el-button type="text" @click="() => { filterPopVisible = !filterPopVisible }">
             <el-icon>
               <Filter />
-            </el-icon>
-            过滤
+            </el-icon>过滤
           </el-button>
         </template>
         <template #default>
           <filter-builder
             :level="0"
-            :filter-group="this.testFilterGroup"
-            :columns="this.innerConfig.headers"
-            @filter-group-change="(filterGroup) => this.testFilterGroup = filterGroup"
+            :filter-group="testFilterGroup"
+            :columns="innerConfig.headers"
+            @filter-group-change="(filterGroup) => testFilterGroup = filterGroup"
           />
         </template>
       </el-popover>
-      <el-popover
-        width="200px"
-        :visible="this.groupPopVisible"
-        transition="el-zoom-in-top"
-      >
+      <el-popover width="200px" :visible="groupPopVisible" transition="el-zoom-in-top">
         <template #reference>
-          <el-button
-            type="text"
-            @click="()=> { this.groupPopVisible = !this.groupPopVisible }"
-          >
+          <el-button type="text" @click="() => { groupPopVisible = !groupPopVisible }">
             <el-icon>
               <Grid />
-            </el-icon>
-            分组
+            </el-icon>分组
           </el-button>
         </template>
         <template #default>
@@ -73,101 +50,31 @@
             size="small"
             placeholder="选择字段"
             value-key="columnName"
-            @change="this.addGroup"
+            @change="addGroup"
             :style="{ width: '200px' }"
           >
             <el-option
-              v-for="col in this.innerConfig.headers"
+              v-for="col in optionalGroupCol"
               :key="col.columnName"
               :label="col.alias"
               :value="col"
             />
           </el-select>
           <el-empty
-            v-if="this.innerConfig.group.length === 0"
+            v-if="innerConfig.group.length === 0"
             :image-size="64"
             description="无分组字段"
           />
           <draggable
-            :list="this.innerConfig.group"
+            :list="innerConfig.group"
             handle=".dt_drag_handle"
             ghost-class="dt_ghost"
             item-key="columnName"
-            @change="() => { this.$emit('configChange', this.innerConfig) }"
+            @change="() => { $emit('configChange', innerConfig) }"
           >
-            <template #item="{ element }">
-              <div :style="{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '8px'
-                }">
-                <el-icon class="dt_drag_handle">
-                  <MoreFilled />
-                </el-icon>
-                <span>{{ element.alias }}</span>
-                <el-radio-group
-                  @change="() => { this.$emit('configChange', this.innerConfig) }"
-                  v-model="element.type"
-                  size="small"
-                >
-                  <el-radio-button label="ASC">升序</el-radio-button>
-                  <el-radio-button label="DESC">降序</el-radio-button>
-                </el-radio-group>
-                <el-icon>
-                  <Close />
-                </el-icon>
-              </div>
-            </template>
-          </draggable>
-        </template>
-      </el-popover>
-      <el-popover
-        width="200px"
-        :visible="this.sortPopVisible"
-        transition="el-zoom-in-top"
-      >
-        <template #reference>
-          <el-button
-            type="text"
-            @click="()=> { this.sortPopVisible = !this.sortPopVisible }"
-          >
-            <el-icon>
-              <Sort />
-            </el-icon>
-            排序
-          </el-button>
-        </template>
-        <template #default>
-          <el-select
-            size="small"
-            placeholder="选择字段"
-            value-key="columnName"
-            :style="{ width: '200px' }"
-            @change="this.addSort"
-          >
-            <el-option
-              v-for="col in this.innerConfig.headers"
-              :key="col.columnName"
-              :label="col.alias"
-              :value="col"
-            />
-          </el-select>
-          <el-empty
-            v-if="this.innerConfig.sort.length === 0"
-            :image-size="64"
-            description="无排序字段"
-          />
-          <br />
-          <draggable
-            :list="innerConfig.sort"
-            handle=".dt_drag_handle"
-            ghost-class="dt_ghost"
-            item-key="columnName"
-            @change="() => { this.$emit('configChange', this.innerConfig) }"
-          >
-            <template #item="{ element }">
-              <div :style="{
+            <template #item="{ element, index }">
+              <div
+                :style="{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -179,14 +86,81 @@
                 </el-icon>
                 <span>{{ element.alias }}</span>
                 <el-radio-group
-                  @change="() => { this.$emit('configChange', this.innerConfig) }"
+                  @change="() => { $emit('configChange', innerConfig) }"
                   v-model="element.type"
                   size="small"
                 >
                   <el-radio-button label="ASC">升序</el-radio-button>
                   <el-radio-button label="DESC">降序</el-radio-button>
                 </el-radio-group>
-                <el-icon>
+                <el-icon
+                  :style="{ cursor: 'pointer' }"
+                  @click="() => cancelGroup(index)"
+                >
+                  <Close />
+                </el-icon>
+              </div>
+            </template>
+          </draggable>
+        </template>
+      </el-popover>
+      <el-popover width="200px" :visible="sortPopVisible" transition="el-zoom-in-top">
+        <template #reference>
+          <el-button type="text" @click="() => { sortPopVisible = !sortPopVisible }">
+            <el-icon>
+              <Sort />
+            </el-icon>排序
+          </el-button>
+        </template>
+        <template #default>
+          <el-select
+            size="small"
+            placeholder="选择字段"
+            value-key="columnName"
+            :style="{ width: '200px' }"
+            @change="addSort"
+          >
+            <el-option
+              v-for="col in optionalSortCol"
+              :key="col.columnName"
+              :label="col.alias"
+              :value="col"
+            />
+          </el-select>
+          <el-empty v-if="innerConfig.sort.length === 0" :image-size="64" description="无排序字段" />
+          <br />
+          <draggable
+            :list="innerConfig.sort"
+            handle=".dt_drag_handle"
+            ghost-class="dt_ghost"
+            item-key="columnName"
+            @change="() => { $emit('configChange', innerConfig) }"
+          >
+            <template #item="{ element, index }">
+              <div
+                :style="{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '8px'
+                }"
+              >
+                <el-icon class="dt_drag_handle">
+                  <MoreFilled />
+                </el-icon>
+                <span>{{ element.alias }}</span>
+                <el-radio-group
+                  @change="() => { $emit('configChange', innerConfig) }"
+                  v-model="element.type"
+                  size="small"
+                >
+                  <el-radio-button label="ASC">升序</el-radio-button>
+                  <el-radio-button label="DESC">降序</el-radio-button>
+                </el-radio-group>
+                <el-icon
+                  :style="{ cursor: 'pointer' }"
+                  @click="() => cancelSort(index)"
+                >
                   <Close />
                 </el-icon>
               </div>
@@ -197,8 +171,7 @@
       <el-button type="text">
         <el-icon>
           <Plus />
-        </el-icon>
-        添加一行
+        </el-icon>添加一行
       </el-button>
     </el-space>
   </el-row>
@@ -209,7 +182,7 @@
         :data="data"
         border
         style="width: 100%"
-        :cell-class-name="this.cellClassChange"
+        :cell-class-name="cellClassChange"
         header-cell-class-name="dt_table_header"
         height="1000"
       >
@@ -224,7 +197,8 @@
               justifyContent: 'center',
               alignItems: 'center',
             }"
-            @click="this.addColumn"
+            @click="addColumn"
+            @keypress="addColumn"
           >
             <el-icon>
               <plus />
@@ -232,10 +206,8 @@
           </div>
         </template>
         <el-table-column>
-          <template #header> </template>
-          <template #default="scope">
-            {{ scope.$index + 1 }}
-          </template>
+          <template #header></template>
+          <template #default="scope">{{ scope.$index + 1 }}</template>
         </el-table-column>
         <el-table-column
           v-for="header in innerConfig.headers.filter(header => header.visible)"
@@ -246,26 +218,25 @@
           <template #default="scope">
             <el-input
               v-if="
-                scope.$index === this.cellRowIdx &&
-                scope.column.no === this.cellColIdx
+                scope.$index === cellRowIdx &&
+                scope.column.no === cellColIdx
               "
               v-model="scope.row[header.columnName]"
-              @blur="this.inputBlur"
+              @blur="inputBlur"
             />
             <div
               v-else
-              @click="() => this.editCell(scope)"
-              @keypress="() => this.editCell(scope)"
+              @click="() => editCell(scope)"
+              @keypress="() => editCell(scope)"
               :style="{ height: '23px' }"
-            >
-              {{ scope.row[header.columnName] }}
-            </div>
+            >{{ scope.row[header.columnName] }}</div>
           </template>
         </el-table-column>
       </el-table>
     </el-col>
     <el-col :span="2">
-      <div :style="{
+      <div
+        :style="{
           cursor: 'pointer',
           display: 'flex',
           height: '38px',
@@ -274,7 +245,8 @@
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: '#f5f5f5',
-        }">
+        }"
+      >
         <el-icon>
           <plus />
         </el-icon>
@@ -296,8 +268,9 @@ import {
 } from '@element-plus/icons-vue';
 import draggable from 'vuedraggable';
 import FilterBuilder from '@/components/FilterBuilder.vue';
-import { IDTConfig, IDTHeader } from '@/common/interface/DynamicTableInterface';
+import { IDTConfig, IDTHeader, IFilterGroup } from '@/common/interface/DynamicTableInterface';
 import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
+import { config } from 'process';
 
 export default defineComponent({
   name: 'DynamicTable',
@@ -331,7 +304,7 @@ export default defineComponent({
       filterPopVisible: false,
       sortPopVisible: false,
       groupPopVisible: false,
-      innerConfig: JSON.parse(JSON.stringify(this.config)),
+      innerConfig: JSON.parse(JSON.stringify(this.config)) as IDTConfig,
       testFilterGroup: {
         key: 'group_1',
         conjunction: 'AND',
@@ -342,6 +315,7 @@ export default defineComponent({
               columnName: 'test',
               alias: '测试',
               dataType: DATA_TYPE.DECIMAL,
+              visible: false,
             },
             operator: {
               operator: {
@@ -362,6 +336,7 @@ export default defineComponent({
                   columnName: 'name',
                   alias: '名字',
                   dataType: DATA_TYPE.SINGLE_LINE_TEXT,
+                  visible: false,
                 },
                 operator: {
                   operator: {
@@ -382,6 +357,7 @@ export default defineComponent({
                       columnName: 'test',
                       alias: '测试',
                       dataType: DATA_TYPE.DATETIME,
+                      visible: false,
                     },
                     operator: {
                       operator: {
@@ -397,8 +373,24 @@ export default defineComponent({
             ],
           },
         ],
-      },
+      } as IFilterGroup,
     };
+  },
+  computed: {
+    optionalSortCol() {
+      const headers = [...this.config.headers];
+      const sort = [...this.config.sort];
+      return headers.filter((col) => sort.every(
+        (sortCol) => sortCol.columnName !== col.columnName,
+      ));
+    },
+    optionalGroupCol() {
+      const headers = [...this.config.headers];
+      const group = [...this.config.group];
+      return headers.filter((col) => group.every(
+        (groupCol) => groupCol.columnName !== col.columnName,
+      ));
+    },
   },
   methods: {
     addColumn() {
@@ -429,12 +421,20 @@ export default defineComponent({
       });
       this.$emit('configChange', this.innerConfig);
     },
+    cancelSort(cancelIdx: number) {
+      this.innerConfig.sort.splice(cancelIdx, 1);
+      this.$emit('configChange', this.innerConfig);
+    },
     addGroup(header: IDTHeader) {
       this.innerConfig.group.push({
         columnName: header.columnName,
         alias: header.alias,
         type: 'ASC',
       });
+      this.$emit('configChange', this.innerConfig);
+    },
+    cancelGroup(cancelIdx: number) {
+      this.innerConfig.group.splice(cancelIdx, 1);
       this.$emit('configChange', this.innerConfig);
     },
   },
