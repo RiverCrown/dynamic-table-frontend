@@ -114,6 +114,9 @@
                   <el-radio-button label="ASC">升序</el-radio-button>
                   <el-radio-button label="DESC">降序</el-radio-button>
                 </el-radio-group>
+                <el-icon>
+                  <Close />
+                </el-icon>
               </div>
             </template>
           </draggable>
@@ -183,6 +186,9 @@
                   <el-radio-button label="ASC">升序</el-radio-button>
                   <el-radio-button label="DESC">降序</el-radio-button>
                 </el-radio-group>
+                <el-icon>
+                  <Close />
+                </el-icon>
               </div>
             </template>
           </draggable>
@@ -286,6 +292,7 @@ import {
   Sort,
   Grid,
   MoreFilled,
+  Close,
 } from '@element-plus/icons-vue';
 import draggable from 'vuedraggable';
 import FilterBuilder from '@/components/FilterBuilder.vue';
@@ -303,6 +310,7 @@ export default defineComponent({
     draggable,
     MoreFilled,
     FilterBuilder,
+    Close,
   },
   props: {
     data: Array,
