@@ -31,9 +31,12 @@
         <template #default>
           <filter-builder
             :level="0"
-            :filter-group="testFilterGroup"
+            :filter-group="innerConfig.filter"
             :columns="innerConfig.headers"
-            @filter-group-change="(filterGroup) => testFilterGroup = filterGroup"
+            @filter-group-change="(filterGroup) => {
+              innerConfig.filter = filterGroup
+              $emit('configChange', innerConfig)
+            }"
           />
         </template>
       </el-popover>
@@ -177,14 +180,15 @@
   </el-row>
   <div :style="{ height: '8px' }" />
   <el-row>
+    <!-- 未分组时显示数据，分组时只显示表头 -->
     <el-col :span="22">
       <el-table
-        :data="data"
+        :data="innerData"
         border
         style="width: 100%"
         :cell-class-name="cellClassChange"
         header-cell-class-name="dt_table_header"
-        height="1000"
+        @cell-click="editCell"
       >
         <template #append>
           <div
@@ -226,8 +230,6 @@
             />
             <div
               v-else
-              @click="() => editCell(scope)"
-              @keypress="() => editCell(scope)"
               :style="{ height: '23px' }"
             >{{ scope.row[header.columnName] }}</div>
           </template>
@@ -268,9 +270,7 @@ import {
 } from '@element-plus/icons-vue';
 import draggable from 'vuedraggable';
 import FilterBuilder from '@/components/FilterBuilder.vue';
-import { IDTConfig, IDTHeader, IFilterGroup } from '@/common/interface/DynamicTableInterface';
-import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
-import { config } from 'process';
+import { IDTConfig, IDTHeader } from '@/common/interface/DynamicTableInterface';
 
 export default defineComponent({
   name: 'DynamicTable',
@@ -286,7 +286,10 @@ export default defineComponent({
     Close,
   },
   props: {
-    data: Array,
+    data: {
+      type: Array as PropType<Array<any>>,
+      required: true,
+    },
     config: {
       type: Object as PropType<IDTConfig>,
       required: true,
@@ -305,75 +308,7 @@ export default defineComponent({
       sortPopVisible: false,
       groupPopVisible: false,
       innerConfig: JSON.parse(JSON.stringify(this.config)) as IDTConfig,
-      testFilterGroup: {
-        key: 'group_1',
-        conjunction: 'AND',
-        filterSet: [
-          {
-            key: 'item_1',
-            column: {
-              columnName: 'test',
-              alias: '测试',
-              dataType: DATA_TYPE.DECIMAL,
-              visible: false,
-            },
-            operator: {
-              operator: {
-                text: '<',
-                value: 'LESS_THAN',
-              },
-              inputType: 'SELECT',
-            },
-            value: 123,
-          },
-          {
-            key: 'group_2',
-            conjunction: 'OR',
-            filterSet: [
-              {
-                key: 'item_2',
-                column: {
-                  columnName: 'name',
-                  alias: '名字',
-                  dataType: DATA_TYPE.SINGLE_LINE_TEXT,
-                  visible: false,
-                },
-                operator: {
-                  operator: {
-                    text: '<',
-                    value: 'LESS_THAN',
-                  },
-                  inputType: 'SELECT',
-                },
-                value: 123,
-              },
-              {
-                key: 'group_3',
-                conjunction: 'AND',
-                filterSet: [
-                  {
-                    key: 'item_3',
-                    column: {
-                      columnName: 'test',
-                      alias: '测试',
-                      dataType: DATA_TYPE.DATETIME,
-                      visible: false,
-                    },
-                    operator: {
-                      operator: {
-                        text: '<',
-                        value: 'LESS_THAN',
-                      },
-                      inputType: 'SELECT',
-                    },
-                    value: 123,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      } as IFilterGroup,
+      innerData: this.data.map((val, idx) => ({ $index: idx, ...val })),
     };
   },
   computed: {
@@ -395,10 +330,6 @@ export default defineComponent({
   methods: {
     addColumn() {
       console.log('add col');
-    },
-    editCell(scope: any) {
-      this.cellColIdx = scope.column.no;
-      this.cellRowIdx = scope.$index;
     },
     inputBlur() {
       this.cellColIdx = -1;
@@ -436,6 +367,10 @@ export default defineComponent({
     cancelGroup(cancelIdx: number) {
       this.innerConfig.group.splice(cancelIdx, 1);
       this.$emit('configChange', this.innerConfig);
+    },
+    editCell(row: any, col: any) {
+      this.cellColIdx = col.no;
+      this.cellRowIdx = row.$index;
     },
   },
 });

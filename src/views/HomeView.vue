@@ -10,6 +10,7 @@
 import { defineComponent } from 'vue';
 import DynamicTable from '@/components/DynamicTable.vue';
 import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
+import { IDTConfig } from '@/common/interface/DynamicTableInterface';
 
 export default defineComponent({
   name: 'HomeView',
@@ -47,7 +48,76 @@ export default defineComponent({
         ],
         sort: [],
         group: [],
-      },
+        filter: {
+          key: 'group_1',
+          conjunction: 'AND',
+          filterSet: [
+            {
+              key: 'item_1',
+              column: {
+                columnName: 'test',
+                alias: '测试',
+                dataType: DATA_TYPE.DECIMAL,
+                visible: false,
+              },
+              operator: {
+                operator: {
+                  text: '<',
+                  value: 'LESS_THAN',
+                },
+                inputType: 'SELECT',
+              },
+              value: 123,
+            },
+            {
+              key: 'group_2',
+              conjunction: 'OR',
+              filterSet: [
+                {
+                  key: 'item_2',
+                  column: {
+                    columnName: 'name',
+                    alias: '名字',
+                    dataType: DATA_TYPE.SINGLE_LINE_TEXT,
+                    visible: false,
+                  },
+                  operator: {
+                    operator: {
+                      text: '<',
+                      value: 'LESS_THAN',
+                    },
+                    inputType: 'SELECT',
+                  },
+                  value: 123,
+                },
+                {
+                  key: 'group_3',
+                  conjunction: 'AND',
+                  filterSet: [
+                    {
+                      key: 'item_3',
+                      column: {
+                        columnName: 'test',
+                        alias: '测试',
+                        dataType: DATA_TYPE.DATETIME,
+                        visible: false,
+                      },
+                      operator: {
+                        operator: {
+                          text: '<',
+                          value: 'LESS_THAN',
+                        },
+                        inputType: 'SELECT',
+                      },
+                      value: 123,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      } as IDTConfig,
 
       tableData: [
         {
