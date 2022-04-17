@@ -226,7 +226,7 @@
                 scope.column.no === cellColIdx
               "
               v-model="scope.row[header.columnName]"
-              @blur="inputBlur"
+              @blur="cellInputBlur"
             />
             <div
               v-else
@@ -258,7 +258,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import {
+  defineComponent,
+  PropType,
+  ref,
+  reactive,
+  computed,
+} from 'vue';
 import {
   Plus,
   Hide,
@@ -298,79 +304,102 @@ export default defineComponent({
   emits: {
     configChange: null,
   },
-  data() {
-    return {
-      cellColIdx: -1,
-      cellRowIdx: -1,
-      // 过滤的下拉框中如果还有选择组件（SELECT），那么在操作选择组件时会因为点击了外部元素而导致下拉框隐藏
-      // 因此需要自己来控制过滤下拉框的显隐
-      filterPopVisible: false,
-      sortPopVisible: false,
-      groupPopVisible: false,
-      innerConfig: JSON.parse(JSON.stringify(this.config)) as IDTConfig,
-      innerData: this.data.map((val, idx) => ({ $index: idx, ...val })),
+  setup(props, ctx) {
+    // * props 数据深拷贝
+    const innerConfig: IDTConfig = reactive(JSON.parse(JSON.stringify(props.config)));
+    const innerData = reactive(props.data.map((val, idx) => ({ $index: idx, ...val })));
+    // * 表格编辑
+    const cellColIdx = ref(-1);
+    const cellRowIdx = ref(-1);
+    const editCell = (row: any, col: any) => {
+      cellColIdx.value = col.no;
+      cellRowIdx.value = row.$index;
     };
-  },
-  computed: {
-    optionalSortCol() {
-      const headers = [...this.config.headers];
-      const sort = [...this.config.sort];
+    const cellInputBlur = () => {
+      cellColIdx.value = -1;
+      cellRowIdx.value = -1;
+    };
+    const cellClassChange = ({ rowIndex, columnIndex }: any) => {
+      if (cellColIdx.value === columnIndex && cellRowIdx.value === rowIndex) {
+        return 'dt_edit_cell';
+      }
+      return '';
+    };
+    // * 添加排序
+    const sortPopVisible = ref(false);
+    const optionalSortCol = computed(() => {
+      const { headers, sort } = props.config;
       return headers.filter((col) => sort.every(
         (sortCol) => sortCol.columnName !== col.columnName,
       ));
-    },
-    optionalGroupCol() {
-      const headers = [...this.config.headers];
-      const group = [...this.config.group];
+    });
+    const addSort = (header: IDTHeader) => {
+      innerConfig.sort.push({
+        columnName: header.columnName,
+        alias: header.alias,
+        type: 'ASC',
+      });
+      ctx.emit('configChange', innerConfig);
+    };
+    const cancelSort = (cancelIdx: number) => {
+      innerConfig.sort.splice(cancelIdx, 1);
+      ctx.emit('configChange', innerConfig);
+    };
+    // * 添加分组
+    const groupPopVisible = ref(false);
+    const optionalGroupCol = computed(() => {
+      const { headers, group } = props.config;
       return headers.filter((col) => group.every(
         (groupCol) => groupCol.columnName !== col.columnName,
       ));
-    },
+    });
+    const addGroup = (header: IDTHeader) => {
+      innerConfig.group.push({
+        columnName: header.columnName,
+        alias: header.alias,
+        type: 'ASC',
+      });
+      ctx.emit('configChange', innerConfig);
+    };
+    const cancelGroup = (cancelIdx: number) => {
+      innerConfig.group.splice(cancelIdx, 1);
+      ctx.emit('configChange', innerConfig);
+    };
+    return {
+      // 表格内部使用
+      innerConfig,
+      innerData,
+      // 表格编辑相关
+      cellColIdx,
+      cellRowIdx,
+      editCell,
+      cellInputBlur,
+      cellClassChange,
+      // 排序相关
+      sortPopVisible,
+      optionalSortCol,
+      addSort,
+      cancelSort,
+      // 分组相关
+      groupPopVisible,
+      optionalGroupCol,
+      addGroup,
+      cancelGroup,
+    };
+  },
+  data() {
+    return {
+      // 过滤的下拉框中如果还有选择组件（SELECT），那么在操作选择组件时会因为点击了外部元素而导致下拉框隐藏
+      // 因此需要自己来控制过滤下拉框的显隐
+      filterPopVisible: false,
+    };
   },
   methods: {
     addColumn() {
       console.log('add col');
     },
-    inputBlur() {
-      this.cellColIdx = -1;
-      this.cellRowIdx = -1;
-    },
-    cellClassChange({ rowIndex, columnIndex }: any) {
-      if (this.cellColIdx === columnIndex && this.cellRowIdx === rowIndex) {
-        return 'dt_edit_cell';
-      }
-      return '';
-    },
     headerVisibleConfigChange() {
       this.$emit('configChange', this.innerConfig);
-    },
-    addSort(header: IDTHeader) {
-      this.innerConfig.sort.push({
-        columnName: header.columnName,
-        alias: header.alias,
-        type: 'ASC',
-      });
-      this.$emit('configChange', this.innerConfig);
-    },
-    cancelSort(cancelIdx: number) {
-      this.innerConfig.sort.splice(cancelIdx, 1);
-      this.$emit('configChange', this.innerConfig);
-    },
-    addGroup(header: IDTHeader) {
-      this.innerConfig.group.push({
-        columnName: header.columnName,
-        alias: header.alias,
-        type: 'ASC',
-      });
-      this.$emit('configChange', this.innerConfig);
-    },
-    cancelGroup(cancelIdx: number) {
-      this.innerConfig.group.splice(cancelIdx, 1);
-      this.$emit('configChange', this.innerConfig);
-    },
-    editCell(row: any, col: any) {
-      this.cellColIdx = col.no;
-      this.cellRowIdx = row.$index;
     },
   },
 });
