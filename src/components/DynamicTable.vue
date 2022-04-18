@@ -13,7 +13,7 @@
               <el-checkbox
                 v-model="header.visible"
                 :label="header.alias"
-                @change="headerVisibleConfigChange"
+                @change="() => { $emit('configChange', innerConfig) }"
                 size="small"
               />
             </el-dropdown-item>
@@ -130,8 +130,11 @@
               :value="col"
             />
           </el-select>
-          <el-empty v-if="innerConfig.sort.length === 0" :image-size="64" description="无排序字段" />
-          <br />
+          <el-empty
+            v-if="innerConfig.sort.length === 0"
+            :image-size="64"
+            description="无排序字段"
+          />
           <draggable
             :list="innerConfig.sort"
             handle=".dt_drag_handle"
@@ -171,7 +174,10 @@
           </draggable>
         </template>
       </el-popover>
-      <el-button type="text">
+      <el-button
+        type="text"
+        @click="addRow"
+      >
         <el-icon>
           <Plus />
         </el-icon>添加一行
@@ -189,42 +195,44 @@
         :cell-class-name="cellClassChange"
         header-cell-class-name="dt_table_header"
         @cell-click="editCell"
+        :height="height"
       >
         <template #append>
           <div
             :style="{
-              cursor: 'pointer',
               display: 'flex',
               height: '38px',
               border: '1px solid var(--el-border-color)',
               borderRadius: 0,
-              justifyContent: 'center',
+              justifyContent: 'start',
               alignItems: 'center',
             }"
-            @click="addColumn"
-            @keypress="addColumn"
           >
-            <el-icon>
+            <el-icon
+              :style="{
+                marginLeft: '8px',
+                cursor: 'pointer',
+              }"
+              @click="addRow"
+            >
               <plus />
             </el-icon>
           </div>
         </template>
-        <el-table-column>
+        <el-table-column min-width="160px">
           <template #header></template>
           <template #default="scope">{{ scope.$index + 1 }}</template>
         </el-table-column>
         <el-table-column
-          v-for="header in innerConfig.headers.filter(header => header.visible)"
+          v-for="header in visibleHeaders"
           :key="header.columnName"
           :prop="header.columnName"
           :label="header.alias"
+          min-width="160px"
         >
           <template #default="scope">
             <el-input
-              v-if="
-                scope.$index === cellRowIdx &&
-                scope.column.no === cellColIdx
-              "
+              v-if="isSelectedCell(scope.$index, scope.column.rawColumnKey)"
               v-model="scope.row[header.columnName]"
               @blur="cellInputBlur"
             />
@@ -248,6 +256,8 @@
           alignItems: 'center',
           backgroundColor: '#f5f5f5',
         }"
+        @click="addCol"
+        @keypress="addCol"
       >
         <el-icon>
           <plus />
@@ -277,6 +287,7 @@ import {
 import draggable from 'vuedraggable';
 import FilterBuilder from '@/components/FilterBuilder.vue';
 import { IDTConfig, IDTHeader } from '@/common/interface/DynamicTableInterface';
+import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
 
 export default defineComponent({
   name: 'DynamicTable',
@@ -300,30 +311,58 @@ export default defineComponent({
       type: Object as PropType<IDTConfig>,
       required: true,
     },
+    height: {
+      type: Object as PropType<number | string>,
+      required: true,
+    },
   },
   emits: {
     configChange: null,
+    dataChange: null,
   },
   setup(props, ctx) {
     // * props 数据深拷贝
+    // 表格本身设置
     const innerConfig: IDTConfig = reactive(JSON.parse(JSON.stringify(props.config)));
     const innerData = reactive(props.data.map((val, idx) => ({ $index: idx, ...val })));
+    const visibleHeaders = computed(() => innerConfig.headers.filter((header) => header.visible));
+    const emptyRow: any = {};
+    innerConfig.headers.forEach((header) => {
+      emptyRow[header.columnName] = '';
+    });
     // * 表格编辑
-    const cellColIdx = ref(-1);
+    const cellColName = ref('');
     const cellRowIdx = ref(-1);
     const editCell = (row: any, col: any) => {
-      cellColIdx.value = col.no;
+      cellColName.value = col.rawColumnKey;
       cellRowIdx.value = row.$index;
     };
+    const isSelectedCell = (rowIdx: number, colName: string) => rowIdx === cellRowIdx.value
+      && colName === cellColName.value;
     const cellInputBlur = () => {
-      cellColIdx.value = -1;
+      cellColName.value = '';
       cellRowIdx.value = -1;
     };
-    const cellClassChange = ({ rowIndex, columnIndex }: any) => {
-      if (cellColIdx.value === columnIndex && cellRowIdx.value === rowIndex) {
+    const cellClassChange = (cell: any) => {
+      if (cellColName.value === cell.column.rawColumnKey && cellRowIdx.value === cell.rowIndex) {
         return 'dt_edit_cell';
       }
       return '';
+    };
+    // * 表格添加行
+    const addRow = () => {
+      innerData.push({ $index: innerData.length, ...emptyRow });
+      ctx.emit('dataChange', innerData);
+    };
+    // * 表格添加列
+    const addCol = () => {
+      innerConfig.headers.push({
+        columnName: 'testt',
+        dataType: DATA_TYPE.SINGLE_LINE_TEXT,
+        alias: '测试试',
+        visible: true,
+      });
+      ctx.emit('configChange', innerConfig);
     };
     // * 添加排序
     const sortPopVisible = ref(false);
@@ -369,12 +408,18 @@ export default defineComponent({
       // 表格内部使用
       innerConfig,
       innerData,
+      visibleHeaders,
       // 表格编辑相关
-      cellColIdx,
+      cellColName,
       cellRowIdx,
       editCell,
+      isSelectedCell,
       cellInputBlur,
       cellClassChange,
+      // 表格添加行
+      addRow,
+      // 表格添加列
+      addCol,
       // 排序相关
       sortPopVisible,
       optionalSortCol,
@@ -395,12 +440,6 @@ export default defineComponent({
     };
   },
   methods: {
-    addColumn() {
-      console.log('add col');
-    },
-    headerVisibleConfigChange() {
-      this.$emit('configChange', this.innerConfig);
-    },
   },
 });
 </script>

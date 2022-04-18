@@ -2,7 +2,9 @@
   <dynamic-table
     :data="tableData"
     :config="config"
+    :height="910"
     @config-change="aa"
+    @data-change="dc"
   />
 </template>
 
@@ -19,8 +21,11 @@ export default defineComponent({
   },
   methods: {
     aa(config: any) {
-      console.log(config);
+      // console.log(config);
       this.config = config;
+    },
+    dc(data: any) {
+      this.tableData = data;
     },
   },
   data() {
@@ -139,87 +144,6 @@ export default defineComponent({
           date: '2016-05-01',
           name: 'Tom',
           address: 'No. 189, Grove St, Los Angeles',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
-        },
-        {
-          name: 'Tom',
         },
       ],
     };
