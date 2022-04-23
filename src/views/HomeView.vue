@@ -1,16 +1,15 @@
 <template>
-  <dynamic-table
-    :data="tableData"
-    :config="config"
-    :height="910"
-    @config-change="aa"
-    @data-change="dc"
-  />
+  <div>
+    <dynamic-table v-if="false" :data="tableData" :config="config" :height="910" @config-change="aa"
+      @data-change="dc" />
+    <page-design />
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import DynamicTable from '@/components/DynamicTable.vue';
+import PageDesign from '@/components/PageDesign.vue';
 import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
 import { IDTConfig } from '@/common/interface/DynamicTableInterface';
 
@@ -18,6 +17,7 @@ export default defineComponent({
   name: 'HomeView',
   components: {
     DynamicTable,
+    PageDesign,
   },
   methods: {
     aa(config: any) {
