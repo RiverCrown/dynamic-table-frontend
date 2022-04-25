@@ -1,15 +1,26 @@
 <template>
   <el-container>
-    <el-aside>
-      <el-button
-        v-for="comp in optionalComponents"
-        :key="comp.type"
-        @click="() => { addComponent(comp.type) }"
-      >
-        {{ comp.name }}
-      </el-button>
+    <el-aside :style="{ padding: '20px', backgroundColor: '#f5f5f9' }">
+      <strong>可选组件</strong>
+      <br /><br />
+      <el-row>
+        <el-col
+          v-for="comp in optionalComponents"
+          :key="comp.type"
+          :span="8"
+          :style="{ marginBottom: '8px' }"
+        >
+          <el-button @click="() => { addComponent(comp.type) }">
+          <el-icon class="el-icon--left">
+            <span :class="`iconfont icon-${comp.icon}`"></span>
+          </el-icon>
+            {{ comp.name }}
+          </el-button>
+        </el-col>
+      </el-row>
     </el-aside>
     <el-main>
+      <strong>页面设计</strong>
       <div
         v-for="comps, rowIndex in innerComponentMatrix"
         :key="rowIndex"
@@ -32,7 +43,8 @@
               <div
                 :style="{
                   display: 'flex',
-                  justifyContent: 'space-between'
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
                 }"
               >
                 {{ element.name }}
@@ -42,13 +54,46 @@
                   </el-icon>
                 </div>
               </div>
-              <component :is="element.type" v-bind="element.props" />
+              <component
+                :is="element.type"
+                v-bind="element.props"
+                :style="{ width: '100%' }"
+              />
             </el-col>
           </template>
         </draggable>
       </div>
     </el-main>
-    <el-aside>right</el-aside>
+    <el-aside :style="{
+      padding: '20px',
+      borderLeft: '1px solid var(--el-border-color)'
+    }">
+      <strong>组件属性</strong>
+      <br /><br />
+      <el-form v-if="clickedComponent">
+        <el-form-item label="字段名称">
+          <el-input
+            v-model="clickedComponent.name"
+          />
+        </el-form-item>
+        <el-form-item label="宽度">
+          <el-slider
+            v-model="clickedComponent.span"
+            :min="1"
+            :max="24"
+          />
+        </el-form-item>
+        <el-form-item
+          v-for="val, key in clickedComponent.props"
+          :key="key"
+          :label="key"
+        >
+          <el-input
+            v-model="clickedComponent.props[key]"
+          />
+        </el-form-item>
+      </el-form>
+    </el-aside>
   </el-container>
 </template>
 
@@ -70,11 +115,11 @@ import { ConjunctionEnum } from '@/common/enum/FilterBuilderEnum';
 import { ElImage, ElInput } from 'element-plus';
 import DynamicTable from '@/components/DynamicTable.vue';
 import { isTemplate } from 'element-plus/lib/utils';
+import '@/assets/iconfont/iconfont.css';
 
 export default defineComponent({
   name: 'PageDesign',
   components: {
-    ElInput,
     draggable,
     DeleteFilled,
   },
@@ -155,16 +200,29 @@ export default defineComponent({
         {
           name: '文本',
           type: 'ElInput',
+          icon: 'text',
         },
         {
           name: '图片',
           type: 'ElImage',
+          icon: 'image-text',
+        },
+        {
+          name: '日期',
+          type: 'ElDatePicker',
+          icon: 'calendar',
         },
       ],
       innerComponentMatrix,
     };
   },
   computed: {
+    clickedComponent(): any {
+      if (this.clickedRowIdx !== -1 && this.clickedColIdx !== -1) {
+        return this.innerComponentMatrix[this.clickedRowIdx][this.clickedColIdx];
+      }
+      return undefined;
+    },
   },
   methods: {
     isClicked(rowIndex: number, colIndex: number) {

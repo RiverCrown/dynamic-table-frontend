@@ -1,0 +1,30 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "194872",
+      "name": "calendar",
+      "font_class": "calendar",
+      "unicode": "e74a",
+      "unicode_decimal": 59210
+    },
+    {
+      "icon_id": "11488057",
+      "name": "image-text",
+      "font_class": "image-text",
+      "unicode": "e753",
+      "unicode_decimal": 59219
+    },
+    {
+      "icon_id": "11488145",
+      "name": "text",
+      "font_class": "text",
+      "unicode": "e768",
+      "unicode_decimal": 59240
+    }
+  ]
+}
