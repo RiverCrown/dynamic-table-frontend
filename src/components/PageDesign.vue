@@ -44,14 +44,21 @@
                 :style="{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  marginBottom: '4px',
                 }"
               >
                 {{ element.name }}
                 <div>
-                  <el-icon>
-                    <DeleteFilled />
-                  </el-icon>
+                  <el-button
+                    size="small"
+                    @click="() => removeComponent(rowIndex, index)"
+                    circle
+                  >
+                    <el-icon >
+                      <DeleteFilled />
+                    </el-icon>
+                  </el-button>
                 </div>
               </div>
               <component
@@ -255,6 +262,9 @@ export default defineComponent({
         },
       ]);
       this.innerComponentMatrix.push([]);
+    },
+    removeComponent(rowIndex: number, colIndex: number) {
+      this.innerComponentMatrix[rowIndex].splice(colIndex, 1);
     },
     layoutChange() {
       const resultMatrix = [[] as any];
