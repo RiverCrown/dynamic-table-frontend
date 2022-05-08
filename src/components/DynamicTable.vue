@@ -312,7 +312,7 @@ export default defineComponent({
       required: true,
     },
     height: {
-      type: Object as PropType<number | string>,
+      type: Number,
       required: true,
     },
   },

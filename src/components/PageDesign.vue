@@ -7,7 +7,9 @@
         justifyContent: 'end',
       }"
     >
-      <el-button type="primary" @click="save"> 保存 </el-button>
+      <el-button type="primary" @click="save">
+        保存
+      </el-button>
     </el-header>
     <el-container>
       <el-aside :style="{ padding: '20px', backgroundColor: '#f5f5f9' }">
@@ -108,7 +110,11 @@
 import { defineComponent, PropType } from 'vue';
 import draggable from 'vuedraggable';
 import { DeleteFilled } from '@element-plus/icons-vue';
-import { IComponentType, IPageComponent, IPageElement } from '@/common/interface/PageDesignInterface';
+import {
+  IComponentType,
+  IPageComponent,
+  IPageElement,
+} from '@/common/interface/PageDesignInterface';
 import {
   DATA_TYPE_OPERATORS_MAP,
   INPUT_TYPE,
@@ -206,7 +212,10 @@ export default defineComponent({
       this.innerElementMatrix = resultMatrix;
     },
     save() {
-      this.$emit('pageChange', this.innerElementMatrix.filter((row) => row.length !== 0));
+      this.$emit(
+        'pageChange',
+        this.innerElementMatrix.filter((row) => row.length !== 0),
+      );
     },
   },
 });

@@ -1,40 +1,28 @@
 <template>
   <div>
-    <dynamic-table v-if="false" :data="tableData" :config="config" :height="910" @config-change="aa"
-      @data-change="dc" />
-    <page-design
-      :optional-components="OPTIONAL_COMPONENTS"
-      @page-change="aa"
+    <dynamic-table
+      :data="tableData"
+      :config="config"
+      :height="910"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import DynamicTable from '@/components/DynamicTable.vue';
-import PageDesign from '@/components/PageDesign.vue';
 import { DATA_TYPE } from '@/common/constant/DynamicTableConstant';
 import { IDTConfig } from '@/common/interface/DynamicTableInterface';
-import { OPTIONAL_COMPONENTS } from '@/common/constant/ComponentConstant';
 
 export default defineComponent({
-  name: 'HomeView',
+  name: 'TableViewPage',
   components: {
     DynamicTable,
-    PageDesign,
   },
-  methods: {
-    aa(config: any) {
-      console.log(config);
-      this.config = config;
-    },
-    dc(data: any) {
-      this.tableData = data;
-    },
+  props: {
   },
   data() {
     return {
-      OPTIONAL_COMPONENTS,
       config: {
         headers: [
           {
@@ -153,5 +141,12 @@ export default defineComponent({
       ],
     };
   },
+  computed: {
+  },
+  methods: {
+  },
 });
 </script>
+
+<style scoped>
+</style>

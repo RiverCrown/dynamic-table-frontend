@@ -1,11 +1,27 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
+import TableBasePage from '../pages/TableBasePage.vue';
+import FormViewPage from '../pages/FormViewPage.vue';
+import TableViewPage from '../pages/TableViewPage.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView,
+    path: '/tableBase/:tableId',
+    name: 'tableBase',
+    component: TableBasePage,
+    children: [
+      {
+        path: 'formView/:viewId',
+        name: 'formView',
+        component: FormViewPage,
+        props: true,
+      },
+      {
+        path: 'tableView/:viewId',
+        name: 'tableView',
+        component: TableViewPage,
+        props: true,
+      },
+    ],
   },
 ];
 
